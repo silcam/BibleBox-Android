@@ -1,11 +1,11 @@
-package org.gospelcoding.biblebox
+package org.gospelcoding.biblebox.android
 
 import android.content.Context
 import android.net.wifi.WifiManager
 import android.os.Build
 import android.net.wifi.WifiConfiguration
 import android.util.Log
-import org.gospelcoding.biblebox.Wifi.WifiInfo
+import org.gospelcoding.biblebox.android.Wifi.WifiInfo
 
 const val DEFAULT_HOTSPOT_IP = "192.168.43.1" // Sad to say this might be the best we can do
 const val ALT_HOTSPOT_IP = "192.168.1.1" // It might be this too :(

@@ -33,4 +33,5 @@ dependencies {
 
     // BibleHead Dependencies
     implementation 'org.nanohttpd:nanohttpd:2.2.0'
+    implementation project(':SharedCode')
 }

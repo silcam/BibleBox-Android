@@ -1,4 +1,4 @@
-package org.gospelcoding.biblebox
+package org.gospelcoding.biblebox.android
 
 import android.content.Context
 import android.net.wifi.WifiManager
