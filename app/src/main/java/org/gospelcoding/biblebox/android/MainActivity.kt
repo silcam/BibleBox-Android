@@ -9,6 +9,11 @@ import android.widget.TextView
 import android.widget.Toast
 import android.Manifest
 
+enum class PermissionRequestCode(val code: Int) {
+    TURN_ON_HOTSPOT(0),
+    START_SERVER(1)
+}
+
 
 class MainActivity : AppCompatActivity() {
     private var server: AndroidServer = AndroidServer()
@@ -26,7 +31,11 @@ class MainActivity : AppCompatActivity() {
     override fun onStart() {
         super.onStart()
         displayWifiInfo(Wifi(this).currentWifiSSID)
-        server.start()
+        ActivityCompat.requestPermissions(
+            this,
+            arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE),
+            PermissionRequestCode.START_SERVER.code
+        )
     }
 
     private fun displayWifiInfo(wifiInfo: Wifi.WifiInfo?) {
@@ -45,15 +54,18 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun wifiToggleButtonPress(ignored: View) {
-        ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION), 42)
+        ActivityCompat.requestPermissions(
+            this,
+            arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION),
+            PermissionRequestCode.TURN_ON_HOTSPOT.code
+        )
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
-        when (requestCode) {
-            42 -> {
-                if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
-                    turnOnHotspot()
-                }
+        if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
+            when (requestCode) {
+                PermissionRequestCode.TURN_ON_HOTSPOT.code -> turnOnHotspot()
+                PermissionRequestCode.START_SERVER.code -> server.start(this)
             }
         }
     }

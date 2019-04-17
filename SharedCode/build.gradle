@@ -21,10 +21,9 @@ kotlin {
             api 'org.jetbrains.kotlin:kotlin-stdlib-common'
         }
 
-        // Add as needed:
-        //        androidMain.dependencies {
-        //            api 'org.jetbrains.kotlin:kotlin-stdlib'
-        //        }
+        androidMain.dependencies {
+            api 'org.jetbrains.kotlin:kotlin-stdlib'
+        }
     }
 }
 
