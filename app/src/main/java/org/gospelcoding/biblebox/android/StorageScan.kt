@@ -12,32 +12,29 @@ const val TARGET_IS_DIR = true
 
 class StorageScan(
     private val context: Context,
-    private val callback: (List<File>)->Unit
-): AsyncTask <Void, Void, List<File>>() {
-    override fun doInBackground(vararg p0: Void?): List<File> {
-        Log.i("BibleBox", "Starting storage scan")
-        val sdCardList = scan(removablePublicStorageRoot(context))
-        val builtInStorageList = scan(nonRemovablePublicStorageRoot(context))
-        Log.i("BibleBox", "Finished storage scan")
-        return sdCardList + builtInStorageList
+    private val callback: (File?)->Unit
+): AsyncTask <Void, Void, File?>() {
+    override fun doInBackground(vararg p0: Void?): File? {
+        val sdCardFound =  scan(removablePublicStorageRoot(context))
+        return sdCardFound ?: scan(nonRemovablePublicStorageRoot(context))
     }
 
-    override fun onPostExecute(files: List<File>) = callback(files)
+    override fun onPostExecute(file: File?) = callback(file)
 
-    private fun scan(root: File?): List<File> {
-        if (root == null) return emptyList()
+    private fun scan(root: File?): File? {
+        if (root == null) return null
 
         val files = root.listFiles()
-        if (files == null) return emptyList()
+        if (files == null) return null
 
-        return files.fold(emptyList(), {
-            foundFiles, file ->
-                when {
-                    isMatch(file) -> foundFiles + file
-                    file.isDirectory -> foundFiles + scan(file)
-                    else -> foundFiles
-                }
-        })
+        for (file in files) {
+            if (isMatch(file)) return file
+            if (file.isDirectory) {
+                val found = scan(file)
+                if (found != null) return found
+            }
+        }
+        return null
     }
 
     private fun isMatch(file: File) =

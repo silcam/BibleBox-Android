@@ -1,6 +1,7 @@
 package org.gospelcoding.biblebox.android
 
 import android.content.Context
+import android.widget.Toast
 import fi.iki.elonen.NanoHTTPD
 import org.gospelcoding.biblebox.common.BibleBoxHTML
 import org.gospelcoding.biblebox.common.StorageScan
@@ -15,8 +16,9 @@ class AndroidServer(val context: Context): NanoHTTPD(PORT) {
     override fun start() {
         super.start()
         StorageScan(context) {
-            files ->
-            bbHTML.init(generateBibleBoxManifest(files))
+            file ->
+            if (file != null) bbHTML.init(generateBibleBoxManifest(file))
+            else Toast.makeText(context, "No BibleBox folder found on device.", Toast.LENGTH_LONG).show()
         }.execute()
     }
 
@@ -25,7 +27,7 @@ class AndroidServer(val context: Context): NanoHTTPD(PORT) {
         if (uriPieces.size < 2) return rootIndex()
         return when (uriPieces[1]) {
             "" -> rootIndex()
-            "src/commonMain/web-assets/biblebox.css", "biblebox.js" -> assetResponse(uriPieces[1])
+            "biblebox.css", "biblebox.js" -> assetResponse(uriPieces[1])
             else -> langIndex(uriPieces[1])
         }
     }
@@ -41,7 +43,7 @@ class AndroidServer(val context: Context): NanoHTTPD(PORT) {
 
     private fun assetResponse(assetName: String): Response {
         val mgr = context.assets
-        val fileStream = mgr.open(assetName)
+        val fileStream = mgr.open("web-assets/$assetName")
         val scanner = Scanner(fileStream).useDelimiter("\\A")
         val content = if (scanner.hasNext()) scanner.next() else ""
         return newFixedLengthResponse(content)

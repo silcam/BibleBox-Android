@@ -6,9 +6,9 @@ import org.gospelcoding.biblebox.common.LanguageManifest
 import org.gospelcoding.biblebox.common.ManifestItem
 import java.io.File
 
-fun generateBibleBoxManifest(rootDirs: List<File>): BibleBoxManifest {
+fun generateBibleBoxManifest(rootDir: File): BibleBoxManifest {
     val bbManifest = BibleBoxManifest()
-    for (rootDir in rootDirs) scanRootDir(rootDir, bbManifest)
+    scanRootDir(rootDir, bbManifest)
     return bbManifest
 }
 
