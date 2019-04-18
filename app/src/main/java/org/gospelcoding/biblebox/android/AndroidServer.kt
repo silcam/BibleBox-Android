@@ -23,6 +23,10 @@ class AndroidServer: NanoHTTPD(PORT) {
     }
 
     override fun serve(session: IHTTPSession?): Response {
-        return newFixedLengthResponse(bbServer.index())
+        val response = when (session?.uri) {
+            "/", null -> bbServer.index()
+            else -> bbServer.langIndex(session.uri.substring(1))
+        }
+        return newFixedLengthResponse(response)
     }
 }
