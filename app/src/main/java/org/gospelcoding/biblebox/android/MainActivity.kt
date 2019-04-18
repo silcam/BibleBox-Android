@@ -8,15 +8,19 @@ import android.view.View
 import android.widget.TextView
 import android.widget.Toast
 import android.Manifest
+import org.gospelcoding.biblebox.common.StorageScan
+import java.io.File
 
 enum class PermissionRequestCode(val code: Int) {
     TURN_ON_HOTSPOT(0),
     START_SERVER(1)
 }
 
+const val SHARED_PREFS_KEY = "org.gospelcoding.biblebox"
+const val BIBLE_BOX_DIR_KEY = "bibleBoxDir"
 
 class MainActivity : AppCompatActivity() {
-    private var server: AndroidServer = AndroidServer(this)
+    private var server: AndroidServer? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -25,23 +29,67 @@ class MainActivity : AppCompatActivity() {
 
     override fun onStop() {
         super.onStop()
-        server.stop()
+        server?.stop()
     }
 
     override fun onStart() {
         super.onStart()
         displayWifiInfo(Wifi(this).currentWifiSSID)
-        ActivityCompat.requestPermissions(
-            this,
-            arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE),
-            PermissionRequestCode.START_SERVER.code
-        )
+        if (server != null) {
+            server?.start()
+        }
+        else {
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE),
+                PermissionRequestCode.START_SERVER.code
+            )
+        }
+    }
+
+    private fun startServer() {
+        getBibleBoxDir {
+            rootDir ->
+            if (rootDir == null) {
+                Toast.makeText(
+                    this,
+                    "No BibleBox folder found on device.",
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+            else {
+                server = AndroidServer(this, rootDir)
+                server?.start()
+            }
+        }
+
+    }
+
+    private fun getBibleBoxDir(callback: (File?)->Unit) {
+        val prefs = getSharedPreferences(SHARED_PREFS_KEY, 0)
+        val rootDirPath = prefs.getString(BIBLE_BOX_DIR_KEY, null)
+        if (rootDirPath != null) {
+            val rootDir = File(rootDirPath)
+            if (rootDir.exists()) {
+                callback(rootDir)
+                return
+            }
+        }
+        StorageScan(this) {
+            rootDir ->
+                callback(rootDir)
+            if (rootDir != null) {
+                val prefsEditor = prefs.edit()
+                prefsEditor.putString(BIBLE_BOX_DIR_KEY, rootDir.absolutePath)
+                prefsEditor.apply()
+            }
+        }.execute()
     }
 
     private fun displayWifiInfo(wifiInfo: Wifi.WifiInfo?) {
         val message = when (wifiInfo) {
             null -> "Not Connected"
-            else -> "${wifiInfo.ssid}\n${wifiInfo.ip}\n${wifiInfo.password ?: ""}"
+            else -> "${wifiInfo.ssid}\n${wifiInfo.ip}:$PORT\n${wifiInfo.password ?: ""}"
         }
 //        val ip: String = Formatter.formatIpAddress(wm.connectionInfo.ipAddress).toString()
         findViewById<TextView>(R.id.IpTextView).text = message
@@ -65,7 +113,7 @@ class MainActivity : AppCompatActivity() {
         if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
             when (requestCode) {
                 PermissionRequestCode.TURN_ON_HOTSPOT.code -> turnOnHotspot()
-                PermissionRequestCode.START_SERVER.code -> server.start()
+                PermissionRequestCode.START_SERVER.code -> startServer()
             }
         }
     }
@@ -84,6 +132,3 @@ class MainActivity : AppCompatActivity() {
         }
     }
 }
-
-// 192.168.43.1 ? or
-// 192.168.1.1

@@ -15,7 +15,7 @@ class BibleBoxHTML {
         <html>
            <head>
                <title>BibleBox</title>
-               <link rel="stylesheet" media="all" href="/biblebox.css" />
+               <link rel="stylesheet" media="all" href="/static/biblebox.css" />
            </head>
            <body>
                $content
@@ -42,7 +42,7 @@ class BibleBoxHTML {
 
     private fun langListRow(lang: LanguageManifest) = """
         <li>
-            <a href='/${lang.name}'>
+            <a href='/languages/${lang.name}'>
                 ${lang.name}
             </a>
         </li>
@@ -76,7 +76,9 @@ class BibleBoxHTML {
     private fun itemRow(item: ManifestItem) = """
         <tr>
             <th></th>
-            <td>${item.name}</td>
+            <td>
+                <a href="${item.filepath}">${item.name}</a>
+            </td>
         </tr>
     """.trimIndent()
 

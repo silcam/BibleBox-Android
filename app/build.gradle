@@ -31,8 +31,8 @@ dependencies {
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
 
-    // BibleHead Dependencies
-    implementation 'org.nanohttpd:nanohttpd:2.3.1'
+    // BibleBox Dependencies
+    implementation 'org.nanohttpd:nanohttpd-webserver:2.3.1'
     implementation project(':SharedCode')
 }
 

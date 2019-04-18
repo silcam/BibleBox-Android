@@ -20,18 +20,18 @@ fun scanRootDir(rootDir: File, bbManifest: BibleBoxManifest) {
             langManifest = LanguageManifest(langDir.name)
             bbManifest.languages += langManifest
         }
-        scanLangDir(langDir, langManifest)
+        scanLangDir(rootDir.absolutePath, langDir, langManifest)
     }
 }
 
-fun scanLangDir(langDir: File, langManifest: LanguageManifest) {
+fun scanLangDir(rootPath: String, langDir: File, langManifest: LanguageManifest) {
     val files = langDir.listFiles()
     for (file in files) {
         when {
-            hasMp3s(file) -> addAudioManifest(langManifest, file)
-            file.isDirectory -> scanLangDir(file, langManifest)
-            isFilm(file) -> addFilm(langManifest, file)
-            isApp(file) -> addApp(langManifest, file)
+            hasMp3s(file) -> addAudioManifest(rootPath, langManifest, file)
+            file.isDirectory -> scanLangDir(rootPath, file, langManifest)
+            isFilm(file) -> addFilm(rootPath, langManifest, file)
+            isApp(file) -> addApp(rootPath, langManifest, file)
         }
     }
 }
@@ -42,15 +42,20 @@ fun isFilm(file: File) = arrayOf("3gp", "mp4").contains(file.extension)
 
 fun isApp(file: File) = arrayOf("apk").contains(file.extension)
 
-fun addAudioManifest(langManifest: LanguageManifest, file: File) {
-    val items = file.listFiles().filter{ it.extension == "mp3" }.map{ManifestItem(it.name, it.absolutePath)}
+fun addAudioManifest(rootPath: String, langManifest: LanguageManifest, file: File) {
+    val items = file
+        .listFiles()
+        .filter{ it.extension == "mp3" }
+        .map{ManifestItem(it.name, relativePath(rootPath, it))}
     langManifest.audio += AudioManifest(file.name, items)
 }
 
-fun addFilm(langManifest: LanguageManifest, file: File) {
-    langManifest.films += ManifestItem(file.name, file.absolutePath)
+fun addFilm(rootPath: String, langManifest: LanguageManifest, file: File) {
+    langManifest.films += ManifestItem(file.name, relativePath(rootPath, file))
 }
 
-fun addApp(langManifest: LanguageManifest, file: File) {
-    langManifest.apps += ManifestItem(file.name, file.absolutePath)
+fun addApp(rootPath: String, langManifest: LanguageManifest, file: File) {
+    langManifest.apps += ManifestItem(file.name, relativePath(rootPath, file))
 }
+
+fun relativePath(rootPath: String, file: File) = file.absolutePath.substring(rootPath.length)
