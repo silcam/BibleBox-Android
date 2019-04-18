@@ -5,16 +5,21 @@
         xmlns:app="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".MainActivity">
+        tools:context=".MainActivity"
+        android:background="#000"
+    >
 
     <TextView
         android:id="@+id/IpTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Put IP Address Here"
+        android:paddingTop="40dp"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
+        app:layout_constraintTop_toTopOf="parent"
+        android:text="Put IP Address Here"
+        android:textSize="40sp"
+        />
 
     <Button
         android:id="@+id/refreshWifiButton"
@@ -25,7 +30,11 @@
         app:layout_constraintTop_toBottomOf="@id/IpTextView"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        android:text="Refresh Wifi Info"/>
+        android:text="Refresh Wifi Info"
+        android:textSize="40sp"
+        android:backgroundTint="@color/colorPrimaryDark"
+        android:padding="12dp"
+        />
 
     <Button
         android:onClick="wifiToggleButtonPress"
@@ -35,7 +44,11 @@
         app:layout_constraintTop_toBottomOf="@id/refreshWifiButton"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        android:text="Turn on Hotspot"/>
+        android:text="Turn on Hotspot"
+        android:textSize="40sp"
+        android:backgroundTint="@color/colorPrimaryDark"
+        android:padding="12dp"
+        />
 
 
 

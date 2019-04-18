@@ -89,7 +89,7 @@ class MainActivity : AppCompatActivity() {
     private fun displayWifiInfo(wifiInfo: Wifi.WifiInfo?) {
         val message = when (wifiInfo) {
             null -> "Not Connected"
-            else -> "${wifiInfo.ssid}\n${wifiInfo.ip}:$PORT\n${wifiInfo.password ?: ""}"
+            else -> "${wifiInfo.ssid.trim('"')}\n${wifiInfo.ip}:$PORT\n${wifiInfo.password ?: ""}"
         }
 //        val ip: String = Formatter.formatIpAddress(wm.connectionInfo.ipAddress).toString()
         findViewById<TextView>(R.id.IpTextView).text = message

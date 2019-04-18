@@ -1,6 +1,7 @@
 package org.gospelcoding.biblebox.android
 
 import android.content.Context
+import android.util.Log
 import fi.iki.elonen.SimpleWebServer
 import org.gospelcoding.biblebox.common.BibleBoxHTML
 import java.io.*
@@ -16,11 +17,19 @@ class AndroidServer(
 
     override fun start() {
         bbHTML.init(generateBibleBoxManifest(rootDir))
-        if (!isAlive)
+        if (!isAlive) {
+            Log.i("BibleBox", "Starting server...")
             super.start()
+        }
+    }
+
+    override fun stop() {
+        super.stop()
+        Log.i("BibleBox", "Server stopped.")
     }
 
     override fun serve(session: IHTTPSession?): Response {
+        Log.i("BibleBox", "Serving ${session?.uri}")
         val uriPieces = session?.uri?.split("/") ?: emptyList()
         if (uriPieces.size < 2 || uriPieces[1]=="") return rootIndex()
         if (uriPieces.size >= 3 && uriPieces[1]=="static") return assetResponse(uriPieces[2])

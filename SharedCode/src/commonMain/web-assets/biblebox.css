@@ -1,4 +1,25 @@
 body {
     font-family: Helvetica, sans-serif;
-    margin: 0;
+    font-size: 14px;
+    padding: 8px;
+    background-color: #000;
+    color: #fff;
+}
+
+a {
+    color: #337ab7;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+ul {
+    list-style-type: none;
+}
+
+ul.langList li {
+    font-size: 18px;
+    padding-bottom: 6px;
 }

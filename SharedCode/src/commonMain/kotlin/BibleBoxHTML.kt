@@ -16,6 +16,8 @@ class BibleBoxHTML {
            <head>
                <title>BibleBox</title>
                <link rel="stylesheet" media="all" href="/static/biblebox.css" />
+               <meta name="viewport" content="width=device-width, initial-scale=1">
+               <meta charset="utf-8">
            </head>
            <body>
                $content
@@ -30,12 +32,15 @@ class BibleBoxHTML {
 
     private fun langIndexHTML(lang: String) = """
         <h1>$lang</h1>
+        <p>
+            <a href="/">&lt; BibleBox</a>
+        </p>
         ${itemsTable(lang)}
     """.trimIndent()
 
 
     private fun langList() = bibleBoxManifest.languages.joinToString(
-            prefix = "<ul>",
+            prefix = "<ul class='langList'>",
             postfix = "</ul>",
             separator = ""
         ) { langListRow(it) }
@@ -56,15 +61,20 @@ class BibleBoxHTML {
     private fun itemsTableHTML(lang: LanguageManifest) = """
         <table>
             <tbody>
-                ${itemsTableHeaderRow("Apps")}
-                ${lang.apps.joinToString("") { itemRow(it)}}
-                ${itemsTableHeaderRow("Audio")}
-                ${lang.audio.joinToString("") { audioItemRow(it) }}
-                ${itemsTableHeaderRow("Films")}
-                ${lang.films.joinToString("") { itemRow(it) }}
+                ${itemsTableSection("Apps", lang.apps)}
+                ${itemsTableSection("Audio", lang.audio)}
+                ${itemsTableSection("Films", lang.films)}
             </tbody>
         </table>
     """.trimIndent()
+
+    private fun itemsTableSection(heading: String, list: List<ManifestItem>): String {
+        if (list.isEmpty()) return ""
+        return """
+            ${itemsTableHeaderRow(heading)}
+            ${list.joinToString(separator = "") { itemRow(it) }}
+        """.trimIndent()
+    }
 
     private fun itemsTableHeaderRow(heading: String) = """
         <tr>
@@ -79,13 +89,6 @@ class BibleBoxHTML {
             <td>
                 <a href="${item.filepath}">${item.name}</a>
             </td>
-        </tr>
-    """.trimIndent()
-
-    private fun audioItemRow(item: AudioManifest) = """
-        <tr>
-            <th></th>
-            <td>${item.name}</td>
         </tr>
     """.trimIndent()
 }
