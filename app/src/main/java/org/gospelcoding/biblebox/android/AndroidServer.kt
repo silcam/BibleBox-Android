@@ -2,31 +2,48 @@ package org.gospelcoding.biblebox.android
 
 import android.content.Context
 import fi.iki.elonen.NanoHTTPD
-import org.gospelcoding.biblebox.common.BibleBoxServer
+import org.gospelcoding.biblebox.common.BibleBoxHTML
 import org.gospelcoding.biblebox.common.StorageScan
+import java.io.*
+import java.util.*
 
 const val PORT = 8080
 
-class AndroidServer: NanoHTTPD(PORT) {
-    private val bbServer = BibleBoxServer()
+class AndroidServer(val context: Context): NanoHTTPD(PORT) {
+    private val bbHTML = BibleBoxHTML()
 
     override fun start() {
-        throw Throwable("Use start(context: Context) instead.")
-    }
-
-    fun start(context: Context) {
         super.start()
         StorageScan(context) {
             files ->
-                bbServer.init(generateBibleBoxManifest(files))
+            bbHTML.init(generateBibleBoxManifest(files))
         }.execute()
     }
 
     override fun serve(session: IHTTPSession?): Response {
-        val response = when (session?.uri) {
-            "/", null -> bbServer.index()
-            else -> bbServer.langIndex(session.uri.substring(1))
+        val uriPieces = session?.uri?.split("/") ?: emptyList()
+        if (uriPieces.size < 2) return rootIndex()
+        return when (uriPieces[1]) {
+            "" -> rootIndex()
+            "src/commonMain/web-assets/biblebox.css", "biblebox.js" -> assetResponse(uriPieces[1])
+            else -> langIndex(uriPieces[1])
         }
-        return newFixedLengthResponse(response)
+    }
+
+    private fun rootIndex() = newFixedLengthResponse(bbHTML.index())
+
+    private fun langIndex(lang: String) = newFixedLengthResponse(bbHTML.langIndex(lang))
+
+    private fun newFixedFileResponse(file: File): Response {
+        val mime = getMimeTypeForFile(file.absolutePath)
+        return newFixedLengthResponse(Response.Status.OK, mime, FileInputStream(file), file.length())
+    }
+
+    private fun assetResponse(assetName: String): Response {
+        val mgr = context.assets
+        val fileStream = mgr.open(assetName)
+        val scanner = Scanner(fileStream).useDelimiter("\\A")
+        val content = if (scanner.hasNext()) scanner.next() else ""
+        return newFixedLengthResponse(content)
     }
 }

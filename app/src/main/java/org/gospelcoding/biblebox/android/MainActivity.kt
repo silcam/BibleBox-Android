@@ -16,7 +16,7 @@ enum class PermissionRequestCode(val code: Int) {
 
 
 class MainActivity : AppCompatActivity() {
-    private var server: AndroidServer = AndroidServer()
+    private var server: AndroidServer = AndroidServer(this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -65,7 +65,7 @@ class MainActivity : AppCompatActivity() {
         if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
             when (requestCode) {
                 PermissionRequestCode.TURN_ON_HOTSPOT.code -> turnOnHotspot()
-                PermissionRequestCode.START_SERVER.code -> server.start(this)
+                PermissionRequestCode.START_SERVER.code -> server.start()
             }
         }
     }

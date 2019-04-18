@@ -32,6 +32,12 @@ dependencies {
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
 
     // BibleHead Dependencies
-    implementation 'org.nanohttpd:nanohttpd:2.2.0'
+    implementation 'org.nanohttpd:nanohttpd:2.3.1'
     implementation project(':SharedCode')
 }
+
+task copyWebAssets(type: Copy) {
+    from "$projectDir/../SharedCode/src/commonMain/web-assets/"
+    into "$projectDir/src/main/assets/web-assets/"
+}
+preBuild.dependsOn(copyWebAssets)
